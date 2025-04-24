@@ -1,7 +1,9 @@
 export interface ApiResponse {
-  choices: {
-    message: {
-      content: string;
+  candidates: {
+    content: {
+      parts: {
+        text: string;
+      }[];
     };
   }[];
   error?: {
@@ -12,7 +14,7 @@ export interface ApiResponse {
 
 export const fetchVerses = async (userInput: string, bibleVersion: string = 'KJV'): Promise<string[]> => {
   try {
-    const apiKey = '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';
+    const apiKey = 'AIzaSyAmHtoypPMbiuzIiOmpT6fBhAW09DZD_H0';
     if (!apiKey) {
       throw new Error('API key not found');
     }
@@ -28,24 +30,21 @@ export const fetchVerses = async (userInput: string, bibleVersion: string = 'KJV
 
     const fullBibleVersion = bibleVersionNames[bibleVersion] || 'King James Version of the Bible';
 
+    const prompt = `Search for the solution of the problem: ${userInput} and give 21 direct answers in the form of Bible verses from the ${fullBibleVersion} that sympathize and provide guidance. For each verse, expand on its meaning with an additional 20-30 words of explanation or context while preserving the original message. Make sure each verse and explanation are clearly connected. Format the response with each verse numbered (1., 2., etc.) and clearly separated.`;
+
     const requestBody = {
-      model: "google/gemini-flash-1.5",
-      messages: [
-        {
-          role: "user",
-          content: `Search for the solution of the problem: ${userInput} and give 21 direct answers in the form of Bible verses from the ${fullBibleVersion} that sympathize and provide guidance. For each verse, expand on its meaning with an additional 20-30 words of explanation or context while preserving the original message. Make sure each verse and explanation are clearly connected.`
-        }
-      ]
+      contents: [{
+        parts: [{ text: prompt }]
+      }]
     };
 
-    console.log('Sending request to OpenRouter API...');
+    console.log('Sending request to Google Generative Language API...');
     console.log('Request body:', JSON.stringify(requestBody, null, 2));
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(requestBody)
     });
@@ -66,13 +65,13 @@ export const fetchVerses = async (userInput: string, bibleVersion: string = 'KJV
       throw new Error(`API Error: ${data.error.message} (Code: ${data.error.code})`);
     }
     
-    // Check if choices array exists and has content
-    if (!data.choices || !data.choices.length || !data.choices[0]?.message?.content) {
+    // Check if candidates array exists and has content
+    if (!data.candidates || !data.candidates.length || !data.candidates[0]?.content?.parts?.[0]?.text) {
       console.log('API Response:', JSON.stringify(data, null, 2));
       throw new Error('No content received from API');
     }
 
-    const content = data.choices[0].message.content;
+    const content = data.candidates[0].content.parts[0].text;
     
     // Split the response into individual verses
     // This regex looks for numbered items like "1." or "21." at the beginning of a line
@@ -89,7 +88,16 @@ export const fetchVerses = async (userInput: string, bibleVersion: string = 'KJV
     return cleanedVerses;
   } catch (error) {
     console.error('Error fetching verses:', error);
+    // Add more detailed error information
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+    }
     throw error;
   }
 };
+
 
