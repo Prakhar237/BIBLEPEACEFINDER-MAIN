@@ -40,7 +40,7 @@ export const fetchVerses = async (userInput: string, bibleVersion: string = 'KJV
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer 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'
+        'Authorization': `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`
       },
       body: JSON.stringify(requestBody)
     });
