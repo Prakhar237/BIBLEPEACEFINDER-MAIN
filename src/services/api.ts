@@ -12,6 +12,11 @@ export interface ApiResponse {
 
 export const fetchVerses = async (userInput: string, bibleVersion: string = 'KJV'): Promise<string[]> => {
   try {
+    const apiKey = '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';
+    if (!apiKey) {
+      throw new Error('API key not found');
+    }
+
     // Map Bible version codes to their full names
     const bibleVersionNames: { [key: string]: string } = {
       'KJV': 'King James Version of the Bible',
@@ -24,7 +29,7 @@ export const fetchVerses = async (userInput: string, bibleVersion: string = 'KJV
     const fullBibleVersion = bibleVersionNames[bibleVersion] || 'King James Version of the Bible';
 
     const requestBody = {
-      model: "google/gemini-2.0-flash-exp:free",
+      model: "google/gemini-flash-1.5",
       messages: [
         {
           role: "user",
@@ -40,7 +45,7 @@ export const fetchVerses = async (userInput: string, bibleVersion: string = 'KJV
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer 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'
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify(requestBody)
     });
@@ -87,3 +92,4 @@ export const fetchVerses = async (userInput: string, bibleVersion: string = 'KJV
     throw error;
   }
 };
+
