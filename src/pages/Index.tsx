@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import ProblemInput from '@/components/ProblemInput';
 import VersesDisplay from '@/components/VersesDisplay';
@@ -10,17 +10,21 @@ import { fetchVerses } from '@/services/api';
 import { useToast } from "@/components/ui/use-toast";
 import { AlertCircle } from 'lucide-react';
 import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import StruggleSelector from '@/components/StruggleSelector';
 
 const translations = {
   en: {
-    tagline: "We provide tailored advice straight from God's word for any situation you're facing"
+    tagline: "We provide tailored advice straight from God's word for any situation you're facing",
+    altTagline: "Gods Word Can Bring You Peace & Inspiration In Any Situation!!!"
   },
   es: {
-    tagline: "Proporcionamos consejos personalizados directamente de la palabra de Dios para cualquier situación que enfrentes"
+    tagline: "Proporcionamos consejos personalizados directamente de la palabra de Dios para cualquier situación que enfrentes",
+    altTagline: "¡La Palabra de Dios Puede Traerte Paz e Inspiración en Cualquier Situación!"
   },
   fr: {
-    tagline: "Nous fournissons des conseils personnalisés directement de la parole de Dieu pour toute situation que vous rencontrez"
+    tagline: "Nous fournissons des conseils personnalisés directement de la parole de Dieu pour toute situation que vous rencontrez",
+    altTagline: "La Parole de Dieu Peut Vous Apporter la Paix et l'Inspiration dans Toute Situation !"
   }
 };
 
@@ -30,11 +34,32 @@ const IndexContent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bibleVersion, setBibleVersion] = useState('KJV');
+  const [showAltTagline, setShowAltTagline] = useState(false);
+  const [showStruggleDropdown, setShowStruggleDropdown] = useState(false);
+  const [selectedStruggle, setSelectedStruggle] = useState<string>('');
   const { toast } = useToast();
   const { language, setLanguage } = useLanguage();
   
+  useEffect(() => {
+    const altTimer = setTimeout(() => {
+      setShowAltTagline(true);
+    }, 10000);
+    const dropdownTimer = setTimeout(() => {
+      setShowStruggleDropdown(true);
+    }, 21000); // 10 seconds for first text + 11 seconds for second text
+    return () => {
+      clearTimeout(altTimer);
+      clearTimeout(dropdownTimer);
+    };
+  }, []);
+
   const t = translations[language as keyof typeof translations] || translations.en;
-  const taglineWords = t.tagline.split(' ');
+  const taglineWords = (showAltTagline ? t.altTagline : t.tagline).split(' ');
+
+  const handleStruggleSelect = (struggle: string) => {
+    setSelectedStruggle(struggle);
+    setUserInput(struggle);
+  };
 
   const handleSubmit = async () => {
     if (!userInput.trim()) return;
@@ -47,8 +72,8 @@ const IndexContent = () => {
         ? userInput 
         : `${userInput} - generate in ${language === 'es' ? 'Spanish' : 'French'}`;
       
-      const fetchedVerses = await fetchVerses(prompt, bibleVersion);
-      setVerses(fetchedVerses);
+      const verses = await fetchVerses(prompt, bibleVersion);
+      setVerses(verses);
       
       setTimeout(() => {
         window.scrollTo({
@@ -58,11 +83,11 @@ const IndexContent = () => {
       }, 100);
     } catch (error) {
       console.error('Error:', error);
-      setError('We couldn\'t retrieve your verses. Please try again later.');
+      setError('Failed to fetch verses. Please try again.');
       toast({
-        title: "Error fetching verses",
-        description: error instanceof Error ? error.message : "We couldn't retrieve your verses. Please try again later.",
-        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch verses. Please try again.",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
@@ -91,23 +116,75 @@ const IndexContent = () => {
         <Header />
         
         <div className="mt-16 md:mt-24">
-          <div className="flex flex-wrap justify-center gap-2 mb-6 text-center">
-            {taglineWords.map((word, index) => (
-              <motion.span
-                key={index}
-                initial={{ opacity: 0, y: 20, scale: 0.5 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{
-                  duration: 0.5,
-                  delay: index * 0.1,
-                  type: "spring",
-                  stiffness: 100
-                }}
-                className="text-lg md:text-xl text-white/90 inline-block"
-              >
-                {word}
-              </motion.span>
-            ))}
+          <div className="flex flex-wrap justify-center gap-2 mb-6 text-center min-h-[48px]">
+            <AnimatePresence mode="wait">
+              {!showStruggleDropdown ? (
+                !showAltTagline ? (
+                  <motion.div
+                    key="tagline"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="flex flex-wrap justify-center gap-2"
+                  >
+                    {taglineWords.map((word, index) => (
+                      <motion.span
+                        key={index}
+                        initial={{ opacity: 0, y: 20, scale: 0.5 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{
+                          duration: 0.5,
+                          delay: index * 0.1,
+                          type: "spring",
+                          stiffness: 100
+                        }}
+                        className="text-lg md:text-xl text-white/90 inline-block"
+                      >
+                        {word}
+                      </motion.span>
+                    ))}
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="altTagline"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="flex flex-wrap justify-center gap-2"
+                  >
+                    {t.altTagline.split(' ').map((word, index) => (
+                      <motion.span
+                        key={index}
+                        initial={{ opacity: 0, y: 20, scale: 0.5 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{
+                          duration: 0.5,
+                          delay: index * 0.1,
+                          type: "spring",
+                          stiffness: 100
+                        }}
+                        className="text-lg md:text-xl text-white/90 inline-block"
+                      >
+                        {word}
+                      </motion.span>
+                    ))}
+                  </motion.div>
+                )
+              ) : (
+                <motion.div
+                  key="struggleSelector"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="w-full flex flex-col items-center"
+                >
+                  <StruggleSelector onStruggleSelect={handleStruggleSelect} />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           <div className="flex justify-center gap-4 mb-6">
             <BibleVersionSelector 

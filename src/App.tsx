@@ -9,7 +9,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import NotFound from "./pages/NotFound";
 import { LanguageProvider } from './contexts/LanguageContext';
-import AudioPlayer from './components/AudioPlayer';
 
 const queryClient = new QueryClient();
 
@@ -34,7 +33,6 @@ function App() {
                   <Route path="/community" element={<Community />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-                <AudioPlayer />
               </div>
             </div>
           </Router>

@@ -4,6 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import html2pdf from 'html2pdf.js';
+import { useLanguage } from '@/contexts/LanguageContext';
+
+const translations = {
+  en: {
+    yourVerses: "Your Verses",
+    saveAsPdf: "Save As PDF"
+  },
+  es: {
+    yourVerses: "Tus Versículos",
+    saveAsPdf: "Guardar Como PDF"
+  },
+  fr: {
+    yourVerses: "Tes Versets",
+    saveAsPdf: "Enregistrer en PDF"
+  }
+};
 
 interface VersesDisplayProps {
   verses: string[];
@@ -12,6 +28,8 @@ interface VersesDisplayProps {
 const VersesDisplay: React.FC<VersesDisplayProps> = ({ verses }) => {
   const { toast } = useToast();
   const contentRef = useRef<HTMLDivElement>(null);
+  const { language } = useLanguage();
+  const t = translations[language as keyof typeof translations] || translations.en;
 
   const exportPdf = async () => {
     if (!contentRef.current || verses.length === 0) return;
@@ -54,14 +72,14 @@ const VersesDisplay: React.FC<VersesDisplayProps> = ({ verses }) => {
   return (
     <div className="w-full max-w-3xl mx-auto mt-10 px-4">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="font-playfair text-2xl md:text-3xl text-white">Your Verses</h2>
+        <h2 className="font-playfair text-2xl md:text-3xl text-white">{t.yourVerses}</h2>
         <Button 
           variant="outline" 
           className="border-black text-black hover:bg-black/10 shadow-sm transition-all duration-300" 
           onClick={exportPdf}
         >
           <Download className="mr-2 h-4 w-4" />
-          Save as PDF
+          {t.saveAsPdf}
         </Button>
       </div>
 

@@ -12,7 +12,7 @@ const Navigation = () => {
     en: {
       home: 'Home',
       products: 'Trusted Products',
-      community: 'Counselling Program'
+      community: 'Counselling Programs'
     },
     es: {
       home: 'Inicio',

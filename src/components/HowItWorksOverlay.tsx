@@ -9,7 +9,7 @@ interface HowItWorksOverlayProps {
 }
 
 const HowItWorksOverlay: React.FC<HowItWorksOverlayProps> = ({ isOpen, onClose }) => {
-  const text = "Bible Peace Finder provides you with Tailored Bible Verses & Simple Safe Advice for any situation you're facing, directly from the Good Book. Please Note: All of our materials are sourced directly from your favorite version of the Bible. Just explain your personal problem in as much or as little detail as you like and we'll provide you with the best Bible verses meant to bring you peace and rest in any circumstance!!!";
+  const text = "Bible Peace Finder provides you with tailored Bible verses & simple safe advice for any situation you're facing, directly from the Good Book. Note: All of our materials are sourced directly from your favourite version of the Bible. Just explain your personal problem in as much or as little detail as you like, or select from our pre-made Choose Your Struggle section and we'll provide you with the best Bible verses meant to bring you peace and rest in any circumstance!!!";
   const words = text.split(' ');
 
   return (

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import HowItWorksOverlay from './HowItWorksOverlay';
 import Navigation from './Navigation';
 import { Button } from "@/components/ui/button";
+import AudioPlayer from './AudioPlayer';
 
 const Header = () => {
   const { language } = useLanguage();
@@ -66,24 +67,20 @@ const Header = () => {
             <span className="h-px w-16 bg-white/30"></span>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="max-w-2xl mx-auto"
-          >
+          <div className="max-w-2xl mx-auto">
             {t.subtitle.split(' ').map((word, index) => (
-              <motion.span
+              <span
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.7 + index * 0.1 }}
                 className="inline-block mr-2 text-white/90 text-xl md:text-2xl font-playfair italic"
               >
                 {word}
-              </motion.span>
+              </span>
             ))}
-          </motion.div>
+          </div>
+
+          <div className="mt-4">
+            <AudioPlayer />
+          </div>
 
           <HowItWorksOverlay 
             isOpen={isOverlayOpen}

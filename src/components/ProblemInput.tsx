@@ -1,31 +1,46 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Mic, MicOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from '@/contexts/LanguageContext';
+
+const translations = {
+  en: {
+    placeholder: "Explain your problem or situation here, or click the button above to - Choose Your Struggle.",
+    findVerses: "Find My Verses",
+    findingVerses: "Finding verses..."
+  },
+  es: {
+    placeholder: "Explica tu problema o situación aquí, o haz clic en el botón de arriba para - Elegir tu Lucha.",
+    findVerses: "Encontrar Mis Versículos",
+    findingVerses: "Buscando versículos..."
+  },
+  fr: {
+    placeholder: "Expliquez votre problème ou situation ici, ou cliquez sur le bouton ci-dessus pour - Choisir votre Lutte.",
+    findVerses: "Trouver Mes Versets",
+    findingVerses: "Recherche de versets..."
+  }
+};
 
 interface ProblemInputProps {
   userInput: string;
-  setUserInput: React.Dispatch<React.SetStateAction<string>>;
+  setUserInput: (input: string) => void;
   handleSubmit: () => void;
   isLoading: boolean;
 }
 
-const ProblemInput: React.FC<ProblemInputProps> = ({ 
-  userInput, 
-  setUserInput, 
+const ProblemInput: React.FC<ProblemInputProps> = ({
+  userInput,
+  setUserInput,
   handleSubmit,
-  isLoading 
+  isLoading
 }) => {
   const [isListening, setIsListening] = useState(false);
-  const { toast } = useToast();
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  // Get reference to the audio element when component mounts
-  React.useEffect(() => {
-    audioRef.current = document.querySelector('audio');
-  }, []);
+  const { toast } = useToast();
+  const { language } = useLanguage();
+  const t = translations[language as keyof typeof translations] || translations.en;
 
   const startListening = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -38,17 +53,19 @@ const ProblemInput: React.FC<ProblemInputProps> = ({
     }
 
     try {
-      // Pause background music when starting to listen
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-
       const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
       const recognition = recognitionRef.current;
 
-      recognition.continuous = true;
-      recognition.interimResults = true;
+      // Configure recognition settings
+      recognition.continuous = false; // Changed to false to prevent duplicate words
+      recognition.interimResults = false; // Changed to false to prevent duplicate words
+      
+      // Add mobile-specific settings
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        recognition.continuous = false;
+        recognition.interimResults = false;
+      }
 
       recognition.onstart = () => {
         setIsListening(true);
@@ -62,16 +79,16 @@ const ProblemInput: React.FC<ProblemInputProps> = ({
         const transcript = Array.from(event.results)
           .map(result => result[0].transcript)
           .join(' ');
-        setUserInput(transcript);
+        
+        // Only update if we have new content
+        if (transcript.trim() !== userInput.trim()) {
+          setUserInput(transcript);
+        }
       };
 
       recognition.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
-        // Resume background music on error
-        if (audioRef.current) {
-          audioRef.current.play();
-        }
         toast({
           title: "Error",
           description: "There was an error with speech recognition. Please try again.",
@@ -81,19 +98,11 @@ const ProblemInput: React.FC<ProblemInputProps> = ({
 
       recognition.onend = () => {
         setIsListening(false);
-        // Resume background music when recognition ends
-        if (audioRef.current) {
-          audioRef.current.play();
-        }
       };
 
       recognition.start();
     } catch (error) {
       console.error('Speech recognition error:', error);
-      // Resume background music on error
-      if (audioRef.current) {
-        audioRef.current.play();
-      }
       toast({
         title: "Error",
         description: "There was an error starting speech recognition. Please try again.",
@@ -106,10 +115,6 @@ const ProblemInput: React.FC<ProblemInputProps> = ({
     if (recognitionRef.current) {
       recognitionRef.current.stop();
       setIsListening(false);
-      // Resume background music when stopping manually
-      if (audioRef.current) {
-        audioRef.current.play();
-      }
       toast({
         title: "Stopped Listening",
         description: "Speech recognition has been stopped.",
@@ -131,7 +136,7 @@ const ProblemInput: React.FC<ProblemInputProps> = ({
         <Textarea
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
-          placeholder="Explain your problem or situation here..."
+          placeholder={t.placeholder}
           className="min-h-28 p-4 text-lg border-0 shadow-lg rounded-2xl bg-[#f5e6d0]/90 backdrop-blur-sm text-gray-800 focus:ring-0 focus:border-0 placeholder:text-gray-600 pr-12"
         />
         <Button
@@ -159,10 +164,10 @@ const ProblemInput: React.FC<ProblemInputProps> = ({
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Finding verses...
+              {t.findingVerses}
             </>
           ) : (
-            "Find My Verses"
+            t.findVerses
           )}
         </Button>
       </div>

@@ -1,78 +1,73 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { Volume2, VolumeX } from "lucide-react";
+import { useLanguage } from '@/contexts/LanguageContext';
+
+const translations = {
+  en: {
+    turnOnMusic: "Turn On Music",
+    turnOffMusic: "Turn Off Music"
+  },
+  es: {
+    turnOnMusic: "Encender Música",
+    turnOffMusic: "Apagar Música"
+  },
+  fr: {
+    turnOnMusic: "Activer la Musique",
+    turnOffMusic: "Désactiver la Musique"
+  }
+};
 
 const AudioPlayer = () => {
-  const [isMuted, setIsMuted] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    // Set up a one-time user interaction listener
-    const handleFirstInteraction = () => {
-      if (audioRef.current) {
-        audioRef.current.loop = true;
-        audioRef.current.volume = 0.5;
-        
-        const playPromise = audioRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(error => {
-            console.error('Error playing audio:', error);
-            toast({
-              title: "Playback Error",
-              description: "Could not start the background music",
-              variant: "destructive",
-            });
-          });
-        }
-      }
-      // Remove the event listener after first interaction
-      document.removeEventListener('click', handleFirstInteraction);
-      document.removeEventListener('keydown', handleFirstInteraction);
-      document.removeEventListener('touchstart', handleFirstInteraction);
-    };
-
-    // Add event listeners for different types of user interactions
-    document.addEventListener('click', handleFirstInteraction);
-    document.addEventListener('keydown', handleFirstInteraction);
-    document.addEventListener('touchstart', handleFirstInteraction);
-
-    // Cleanup
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = '';
-      }
-      document.removeEventListener('click', handleFirstInteraction);
-      document.removeEventListener('keydown', handleFirstInteraction);
-      document.removeEventListener('touchstart', handleFirstInteraction);
-    };
-  }, []);
+  const [isMuted, setIsMuted] = useState(true);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { language } = useLanguage();
+  const t = translations[language as keyof typeof translations] || translations.en;
 
   const toggleMute = () => {
     if (audioRef.current) {
-      audioRef.current.muted = !isMuted;
+      if (isMuted) {
+        audioRef.current.muted = false;
+        audioRef.current.play().catch(error => {
+          console.error("Error playing audio:", error);
+        });
+      } else {
+        audioRef.current.muted = true;
+        audioRef.current.pause();
+      }
       setIsMuted(!isMuted);
     }
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className="px-4">
       <audio
         ref={audioRef}
         src="/Zen.mp3"
-        preload="auto"
         loop
-        muted={isMuted}
+        preload="auto"
+        muted={true}
       />
       <Button
-        variant="ghost"
-        size="icon"
         onClick={toggleMute}
-        className="bg-white/10 text-white hover:bg-white/20 rounded-full p-2"
+        variant="ghost"
+        className={`w-full max-w-2xl mx-auto py-3 px-6 rounded-lg text-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+          isMuted 
+            ? 'bg-gray-100/20 text-gray-300 hover:bg-gray-100/30' 
+            : 'bg-amber-100/20 text-amber-300 hover:bg-amber-100/30'
+        }`}
       >
-        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+        {isMuted ? (
+          <>
+            <VolumeX className="h-5 w-5" />
+            <span>{t.turnOnMusic}</span>
+          </>
+        ) : (
+          <>
+            <Volume2 className="h-5 w-5" />
+            <span>{t.turnOffMusic}</span>
+          </>
+        )}
       </Button>
     </div>
   );
