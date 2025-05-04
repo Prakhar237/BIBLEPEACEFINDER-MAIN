@@ -1,10 +1,12 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import VerseCard from './VerseCard';
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, Bookmark, BookmarkCheck } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import html2pdf from 'html2pdf.js';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import AuthModal from './AuthModal';
 
 const translations = {
   en: {
@@ -30,6 +32,10 @@ const VersesDisplay: React.FC<VersesDisplayProps> = ({ verses }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const { language } = useLanguage();
   const t = translations[language as keyof typeof translations] || translations.en;
+  const { isAuthenticated } = useAuth();
+  const [bookmarked, setBookmarked] = useState<{ [key: number]: boolean }>({});
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalPosition, setAuthModalPosition] = useState<{ top: number; left: number } | undefined>(undefined);
 
   const exportPdf = async () => {
     if (!contentRef.current || verses.length === 0) return;
@@ -64,6 +70,25 @@ const VersesDisplay: React.FC<VersesDisplayProps> = ({ verses }) => {
     }
   };
 
+  const handleBookmark = (i: number) => {
+    if (!isAuthenticated) {
+      // Find the ProblemInput box and get its position
+      const inputBox = document.getElementById('problem-input-box');
+      if (inputBox) {
+        const rect = inputBox.getBoundingClientRect();
+        setAuthModalPosition({
+          top: rect.top + window.scrollY + rect.height / 2,
+          left: rect.left + window.scrollX + rect.width / 2,
+        });
+      } else {
+        setAuthModalPosition(undefined);
+      }
+      setShowAuthModal(true);
+      return;
+    }
+    setBookmarked(prev => ({ ...prev, [i]: !prev[i] }));
+  };
+
   if (verses.length === 0) return null;
 
   // Always skip the first verse and display the rest
@@ -89,12 +114,20 @@ const VersesDisplay: React.FC<VersesDisplayProps> = ({ verses }) => {
             Here are your 21 Bible Verses that sympathise with your situation and provide you guidance
           </div>
           {displayVerses.length > 0 ? (
-            displayVerses.map((verse, index) => (
-              <VerseCard key={index} verse={verse} index={index} />
+            displayVerses.map((verse, i) => (
+              <VerseCard
+                key={i}
+                verse={verse}
+                index={i}
+                isBookmarked={!!bookmarked[i]}
+                onBookmark={() => handleBookmark(i)}
+                bookmarkDisabled={!isAuthenticated}
+              />
             ))
           ) : null}
         </div>
       </div>
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} position={authModalPosition} />}
     </div>
   );
 };

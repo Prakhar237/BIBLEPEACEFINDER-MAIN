@@ -34,27 +34,28 @@ const IndexContent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bibleVersion, setBibleVersion] = useState('KJV');
+  const [showTagline, setShowTagline] = useState(false);
   const [showAltTagline, setShowAltTagline] = useState(false);
-  const [showStruggleDropdown, setShowStruggleDropdown] = useState(false);
   const [selectedStruggle, setSelectedStruggle] = useState<string>('');
   const { toast } = useToast();
   const { language, setLanguage } = useLanguage();
   
   useEffect(() => {
-    const altTimer = setTimeout(() => {
+    const taglineTimer = setTimeout(() => {
+      setShowTagline(true);
+    }, 0);
+    
+    const altTaglineTimer = setTimeout(() => {
       setShowAltTagline(true);
-    }, 10000);
-    const dropdownTimer = setTimeout(() => {
-      setShowStruggleDropdown(true);
-    }, 21000); // 10 seconds for first text + 11 seconds for second text
+    }, 3500);
+    
     return () => {
-      clearTimeout(altTimer);
-      clearTimeout(dropdownTimer);
+      clearTimeout(taglineTimer);
+      clearTimeout(altTaglineTimer);
     };
   }, []);
 
   const t = translations[language as keyof typeof translations] || translations.en;
-  const taglineWords = (showAltTagline ? t.altTagline : t.tagline).split(' ');
 
   const handleStruggleSelect = (struggle: string) => {
     setSelectedStruggle(struggle);
@@ -116,92 +117,89 @@ const IndexContent = () => {
         <Header />
         
         <div className="mt-16 md:mt-24">
-          <div className="flex flex-wrap justify-center gap-2 mb-6 text-center min-h-[48px]">
+          <div className="flex flex-col items-center gap-4 -mt-20">
             <AnimatePresence mode="wait">
-              {!showStruggleDropdown ? (
-                !showAltTagline ? (
-                  <motion.div
-                    key="tagline"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="flex flex-wrap justify-center gap-2"
-                  >
-                    {taglineWords.map((word, index) => (
-                      <motion.span
-                        key={index}
-                        initial={{ opacity: 0, y: 20, scale: 0.5 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        transition={{
-                          duration: 0.5,
-                          delay: index * 0.1,
-                          type: "spring",
-                          stiffness: 100
-                        }}
-                        className="text-lg md:text-xl text-white/90 inline-block"
-                      >
-                        {word}
-                      </motion.span>
-                    ))}
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="altTagline"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="flex flex-wrap justify-center gap-2"
-                  >
-                    {t.altTagline.split(' ').map((word, index) => (
-                      <motion.span
-                        key={index}
-                        initial={{ opacity: 0, y: 20, scale: 0.5 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        transition={{
-                          duration: 0.5,
-                          delay: index * 0.1,
-                          type: "spring",
-                          stiffness: 100
-                        }}
-                        className="text-lg md:text-xl text-white/90 inline-block"
-                      >
-                        {word}
-                      </motion.span>
-                    ))}
-                  </motion.div>
-                )
-              ) : (
+              {showTagline && (
                 <motion.div
-                  key="struggleSelector"
+                  key="tagline"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="w-full flex flex-col items-center"
+                  className="flex flex-wrap justify-center gap-2"
                 >
-                  <StruggleSelector onStruggleSelect={handleStruggleSelect} />
+                  {t.tagline.split(' ').map((word, index) => (
+                    <motion.span
+                      key={index}
+                      initial={{ opacity: 0, y: 20, scale: 0.5 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{
+                        duration: 0.5,
+                        delay: index * 0.1,
+                        type: "spring",
+                        stiffness: 100
+                      }}
+                      className="text-lg md:text-xl text-white/90 inline-block"
+                    >
+                      {word}
+                    </motion.span>
+                  ))}
+                </motion.div>
+              )}
+              
+              {showAltTagline && (
+                <motion.div
+                  key="altTagline"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="flex flex-wrap justify-center gap-2"
+                >
+                  {t.altTagline.split(' ').map((word, index) => (
+                    <motion.span
+                      key={index}
+                      initial={{ opacity: 0, y: 20, scale: 0.5 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{
+                        duration: 0.5,
+                        delay: index * 0.1,
+                        type: "spring",
+                        stiffness: 100
+                      }}
+                      className="text-lg md:text-xl text-white/90 inline-block"
+                    >
+                      {word}
+                    </motion.span>
+                  ))}
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
-          <div className="flex justify-center gap-4 mb-6">
-            <BibleVersionSelector 
-              onVersionChange={handleBibleVersionChange}
-              selectedVersion={bibleVersion}
-            />
-            <LanguageSelector 
-              onLanguageChange={handleLanguageChange} 
-              currentLanguage={language}
+
+          <div className="mt-10">
+            <div className="flex flex-wrap justify-center gap-2 mb-6 text-center min-h-[48px]">
+              <StruggleSelector onStruggleSelect={handleStruggleSelect} />
+            </div>
+            
+            <div className="flex justify-center gap-4 mb-6">
+              <BibleVersionSelector 
+                onVersionChange={handleBibleVersionChange}
+                selectedVersion={bibleVersion}
+              />
+              <LanguageSelector 
+                onLanguageChange={handleLanguageChange} 
+                currentLanguage={language}
+              />
+            </div>
+            
+            <ProblemInput 
+              userInput={userInput}
+              setUserInput={setUserInput}
+              handleSubmit={handleSubmit}
+              isLoading={isLoading}
             />
           </div>
-          <ProblemInput 
-            userInput={userInput}
-            setUserInput={setUserInput}
-            handleSubmit={handleSubmit}
-            isLoading={isLoading}
-          />
         </div>
         
         {error && (

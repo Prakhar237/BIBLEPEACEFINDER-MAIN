@@ -1,28 +1,35 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
+import AuthModal from './AuthModal';
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 const Navigation = () => {
   const { language } = useLanguage();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const translations = {
     en: {
       home: 'Home',
-      products: 'Trusted Products',
-      community: 'Counselling Programs'
+      workOfFaith: 'Work of Faith',
+      trustedProducts: 'Trusted Products',
+      counsellingProgram: 'Counselling Program'
     },
     es: {
       home: 'Inicio',
-      products: 'Productos Confiables',
-      community: 'Programa de Consejería'
+      workOfFaith: 'Obra de Fe',
+      trustedProducts: 'Productos Confiables',
+      counsellingProgram: 'Programa de Consejería'
     },
     fr: {
       home: 'Accueil',
-      products: 'Produits de Confiance',
-      community: 'Programme de Conseil'
+      workOfFaith: 'Œuvre de Foi',
+      trustedProducts: 'Produits de Confiance',
+      counsellingProgram: 'Programme de Conseil'
     }
   };
 
@@ -30,8 +37,14 @@ const Navigation = () => {
 
   const navLinks = [
     { to: '/', label: t.home },
-    { to: '/products', label: t.products },
-    { to: '/community', label: t.community }
+    { 
+      label: t.workOfFaith,
+      subMenu: [
+        { to: '/trusted-products', label: t.trustedProducts },
+        { to: '/counselling-program', label: t.counsellingProgram }
+      ]
+    },
+    { label: 'Create Account', onClick: () => setShowAuthModal(true) }
   ];
 
   return (
@@ -52,39 +65,120 @@ const Navigation = () => {
         }`}
       >
         <div className="flex flex-col items-center justify-center h-full gap-6">
-          {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              onClick={() => setIsMenuOpen(false)}
-              className={`text-2xl px-6 py-3 rounded-lg transition-all duration-300 ${
-                location.pathname === link.to
-                  ? 'bg-white/20 text-white'
-                  : 'text-white/70 hover:bg-white/10'
-              }`}
-            >
-              {link.label}
-            </Link>
+          {navLinks.map((link, index) => (
+            <div key={index} className="flex flex-col items-center">
+              {link.to ? (
+                <Link
+                  to={link.to}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`text-2xl px-6 py-3 rounded-lg transition-all duration-300 ${
+                    location.pathname === link.to
+                      ? 'bg-white/20 text-white'
+                      : 'text-white/70 hover:bg-white/10'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <div className="flex flex-col items-center">
+                  <button
+                    onClick={() => setIsSubMenuOpen(!isSubMenuOpen)}
+                    className={`text-2xl px-6 py-3 rounded-lg transition-all duration-300 flex items-center gap-2 ${
+                      isSubMenuOpen
+                        ? 'bg-white/20 text-white'
+                        : 'text-white/70 hover:bg-white/10'
+                    }`}
+                  >
+                    {link.label}
+                    <ChevronDown size={20} />
+                  </button>
+                  {isSubMenuOpen && (
+                    <div className="flex flex-col items-center mt-2 gap-2">
+                      {link.subMenu?.map((subLink) => (
+                        <Link
+                          key={subLink.to}
+                          to={subLink.to}
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            setIsSubMenuOpen(false);
+                          }}
+                          className={`text-xl px-4 py-2 rounded-lg transition-all duration-300 ${
+                            location.pathname === subLink.to
+                              ? 'bg-white/20 text-white'
+                              : 'text-white/70 hover:bg-white/10'
+                          }`}
+                        >
+                          {subLink.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </div>
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex justify-center gap-4 mb-8">
-        {navLinks.map((link) => (
-          <Link
-            key={link.to}
-            to={link.to}
-            className={`px-4 py-2 rounded-lg transition-all duration-300 ${
-              location.pathname === link.to
-                ? 'bg-white/20 text-white'
-                : 'text-white/70 hover:bg-white/10'
-            }`}
-          >
-            {link.label}
-          </Link>
+        {navLinks.map((link, index) => (
+          <div key={index} className="relative">
+            {link.to ? (
+              <Link
+                to={link.to}
+                className={`px-4 py-2 rounded-md transition-all duration-300 flex items-center text-white/80 hover:bg-white/10 hover:text-white${location.pathname === link.to ? ' bg-white/10 text-white shadow-sm' : ''}`}
+              >
+                {link.label}
+              </Link>
+            ) : link.subMenu ? (
+              <div className="relative group">
+                <button
+                  className={`px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-1 ${
+                    location.pathname === '/trusted-products' || location.pathname === '/counselling-program'
+                      ? 'bg-white/20 text-white'
+                      : 'text-white/70 hover:bg-white/10'
+                  }`}
+                >
+                  {link.label}
+                  <ChevronDown size={16} />
+                </button>
+                <div className="absolute top-full left-0 mt-1 w-48 bg-white/10 backdrop-blur-sm rounded-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                  {link.subMenu?.map((subLink) => (
+                    <Link
+                      key={subLink.to}
+                      to={subLink.to}
+                      className={`block px-4 py-2 text-white/70 hover:text-white hover:bg-white/20 transition-all duration-300 ${
+                        location.pathname === subLink.to ? 'bg-white/20 text-white' : ''
+                      }`}
+                    >
+                      {subLink.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={link.onClick}
+                    className="px-4 py-2 rounded-md transition-all duration-300 text-white/80 hover:bg-white/10 hover:text-white"
+                  >
+                    {link.label}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="bg-black">
+                  <span className="font-montserrat font-bold text-yellow-400 drop-shadow-[0_0_6px_rgba(255,215,0,0.8)]">
+                    Creating your account allows you to bookmark and save your favourite Bible Verses.
+                  </span>
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
         ))}
       </div>
+      {/* Auth Modal */}
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
     </nav>
   );
 };

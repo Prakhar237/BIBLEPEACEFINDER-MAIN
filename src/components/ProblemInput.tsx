@@ -7,17 +7,17 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 const translations = {
   en: {
-    placeholder: "Explain your problem or situation here, or click the button above to - Choose Your Struggle.",
+    placeholder: "\"Explain your problem/situation here or click the button above to- Choose your struggle...\"",
     findVerses: "Find My Verses",
     findingVerses: "Finding verses..."
   },
   es: {
-    placeholder: "Explica tu problema o situación aquí, o haz clic en el botón de arriba para - Elegir tu Lucha.",
+    placeholder: "\"Explica tu problema/situación aquí o haz clic en el botón de arriba para- Elegir tu lucha...\"",
     findVerses: "Encontrar Mis Versículos",
     findingVerses: "Buscando versículos..."
   },
   fr: {
-    placeholder: "Expliquez votre problème ou situation ici, ou cliquez sur le bouton ci-dessus pour - Choisir votre Lutte.",
+    placeholder: "\"Expliquez votre problème/situation ici ou cliquez sur le bouton ci-dessus pour- Choisir votre lutte...\"",
     findVerses: "Trouver Mes Versets",
     findingVerses: "Recherche de versets..."
   }
@@ -131,7 +131,7 @@ const ProblemInput: React.FC<ProblemInputProps> = ({
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 flex flex-col items-center space-y-6">
+    <div id="problem-input-box" className="w-full max-w-2xl mx-auto px-4 flex flex-col items-center space-y-6">
       <div className="w-full relative">
         <Textarea
           value={userInput}

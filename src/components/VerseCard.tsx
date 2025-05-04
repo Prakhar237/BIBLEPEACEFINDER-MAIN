@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Share2, Facebook, Instagram, MessageSquare } from "lucide-react";
+import { Download, Share2, Facebook, Instagram, MessageSquare, Bookmark, BookmarkCheck } from "lucide-react";
 import { Twitter } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import SpeakButton from './SpeakButton';
@@ -11,9 +11,12 @@ import { useToast } from "@/hooks/use-toast";
 interface VerseCardProps {
   verse: string;
   index: number;
+  isBookmarked?: boolean;
+  onBookmark?: () => void;
+  bookmarkDisabled?: boolean;
 }
 
-const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
+const VerseCard: React.FC<VerseCardProps> = ({ verse, index, isBookmarked, onBookmark, bookmarkDisabled }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
@@ -203,6 +206,16 @@ const VerseCard: React.FC<VerseCardProps> = ({ verse, index }) => {
             </div>
 
             <SpeakButton text={text} />
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onBookmark}
+              className={`text-yellow-400 hover:text-yellow-500 rounded-full p-2`}
+              title={bookmarkDisabled ? 'Sign in/up to bookmark' : isBookmarked ? 'Remove Bookmark' : 'Bookmark this verse'}
+            >
+              {isBookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+            </Button>
           </div>
         </div>
       </CardContent>
