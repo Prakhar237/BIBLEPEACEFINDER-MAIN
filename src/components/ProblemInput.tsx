@@ -7,17 +7,17 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 const translations = {
   en: {
-    placeholder: "\"Explain your problem/situation here or click the button above to- Choose your struggle...\"",
+    placeholder: "Explain your problem/situation here or click the button above to- Choose your struggle...",
     findVerses: "Find My Verses",
     findingVerses: "Finding verses..."
   },
   es: {
-    placeholder: "\"Explica tu problema/situación aquí o haz clic en el botón de arriba para- Elegir tu lucha...\"",
+    placeholder: "Explica tu problema/situación aquí o haz clic en el botón de arriba para- Elegir tu lucha...",
     findVerses: "Encontrar Mis Versículos",
     findingVerses: "Buscando versículos..."
   },
   fr: {
-    placeholder: "\"Expliquez votre problème/situation ici ou cliquez sur le bouton ci-dessus pour- Choisir votre lutte...\"",
+    placeholder: "Expliquez votre problème/situation ici ou cliquez sur le bouton ci-dessus pour- Choisir votre lutte...",
     findVerses: "Trouver Mes Versets",
     findingVerses: "Recherche de versets..."
   }
