@@ -34,31 +34,21 @@ const IndexContent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bibleVersion, setBibleVersion] = useState('KJV');
-  const [showTagline, setShowTagline] = useState(false);
-  const [showAltTagline, setShowAltTagline] = useState(false);
-  const [selectedStruggle, setSelectedStruggle] = useState<string>('');
+  const [taglineIndex, setTaglineIndex] = useState(0);
   const { toast } = useToast();
   const { language, setLanguage } = useLanguage();
   
   useEffect(() => {
-    const taglineTimer = setTimeout(() => {
-      setShowTagline(true);
-    }, 0);
-    
-    const altTaglineTimer = setTimeout(() => {
-      setShowAltTagline(true);
-    }, 3500);
-    
-    return () => {
-      clearTimeout(taglineTimer);
-      clearTimeout(altTaglineTimer);
-    };
+    setTaglineIndex(0);
+    const timer = setTimeout(() => {
+      setTaglineIndex(1);
+    }, 7500);
+    return () => clearTimeout(timer);
   }, []);
 
   const t = translations[language as keyof typeof translations] || translations.en;
 
   const handleStruggleSelect = (struggle: string) => {
-    setSelectedStruggle(struggle);
     setUserInput(struggle);
   };
 
@@ -119,7 +109,7 @@ const IndexContent = () => {
         <div className="mt-16 md:mt-24">
           <div className="flex flex-col items-center gap-4 -mt-20">
             <AnimatePresence mode="wait">
-              {showTagline && (
+              {taglineIndex === 0 && (
                 <motion.div
                   key="tagline"
                   initial={{ opacity: 0 }}
@@ -146,8 +136,7 @@ const IndexContent = () => {
                   ))}
                 </motion.div>
               )}
-              
-              {showAltTagline && (
+              {taglineIndex === 1 && (
                 <motion.div
                   key="altTagline"
                   initial={{ opacity: 0 }}

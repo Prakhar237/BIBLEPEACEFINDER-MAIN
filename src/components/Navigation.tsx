@@ -15,21 +15,24 @@ const Navigation = () => {
   const translations = {
     en: {
       home: 'Home',
-      workOfFaith: 'Work of Faith',
+      workOfFaith: 'Works of Faith',
       trustedProducts: 'Trusted Products',
-      counsellingProgram: 'Counselling Program'
+      counsellingProgram: 'Counselling Programs',
+      ebooks: 'E-books'
     },
     es: {
       home: 'Inicio',
-      workOfFaith: 'Obra de Fe',
+      workOfFaith: 'Obras de Fe',
       trustedProducts: 'Productos Confiables',
-      counsellingProgram: 'Programa de Consejería'
+      counsellingProgram: 'Programas de Consejería',
+      ebooks: 'E-libros'
     },
     fr: {
       home: 'Accueil',
-      workOfFaith: 'Œuvre de Foi',
+      workOfFaith: 'Œuvres de Foi',
       trustedProducts: 'Produits de Confiance',
-      counsellingProgram: 'Programme de Conseil'
+      counsellingProgram: 'Programmes de Conseil',
+      ebooks: 'E-livres'
     }
   };
 
@@ -41,7 +44,8 @@ const Navigation = () => {
       label: t.workOfFaith,
       subMenu: [
         { to: '/trusted-products', label: t.trustedProducts },
-        { to: '/counselling-program', label: t.counsellingProgram }
+        { to: '/counselling-program', label: t.counsellingProgram },
+        { to: '/ebooks', label: t.ebooks }
       ]
     },
     { label: 'Create Account', onClick: () => setShowAuthModal(true) }
@@ -93,7 +97,7 @@ const Navigation = () => {
                     <ChevronDown size={20} />
                   </button>
                   {isSubMenuOpen && (
-                    <div className="flex flex-col items-center mt-2 gap-2">
+                    <div className="flex flex-row items-center mt-2 gap-4">
                       {link.subMenu?.map((subLink) => (
                         <Link
                           key={subLink.to}
@@ -102,7 +106,7 @@ const Navigation = () => {
                             setIsMenuOpen(false);
                             setIsSubMenuOpen(false);
                           }}
-                          className={`text-xl px-4 py-2 rounded-lg transition-all duration-300 ${
+                          className={`whitespace-nowrap text-xl px-4 py-2 rounded-lg transition-all duration-300 ${
                             location.pathname === subLink.to
                               ? 'bg-white/20 text-white'
                               : 'text-white/70 hover:bg-white/10'
@@ -143,18 +147,22 @@ const Navigation = () => {
                   {link.label}
                   <ChevronDown size={16} />
                 </button>
-                <div className="absolute top-full left-0 mt-1 w-48 bg-white/10 backdrop-blur-sm rounded-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                  {link.subMenu?.map((subLink) => (
-                    <Link
-                      key={subLink.to}
-                      to={subLink.to}
-                      className={`block px-4 py-2 text-white/70 hover:text-white hover:bg-white/20 transition-all duration-300 ${
-                        location.pathname === subLink.to ? 'bg-white/20 text-white' : ''
-                      }`}
-                    >
-                      {subLink.label}
-                    </Link>
-                  ))}
+                <div className="absolute top-full -left-44 mt-1 w-[500px] bg-white/10 backdrop-blur-sm rounded-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                  <div className="grid grid-cols-3 divide-x divide-white/10">
+                    {link.subMenu?.map((subLink) => (
+                      <div className="px-4 flex justify-center">
+                        <Link
+                          key={subLink.to}
+                          to={subLink.to}
+                          className={`block w-[200px] text-center whitespace-nowrap py-2 text-white/70 hover:text-white hover:bg-white/20 transition-all duration-300 ${
+                            location.pathname === subLink.to ? 'bg-white/20 text-white' : ''
+                          }`}
+                        >
+                          {subLink.label}
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ) : (
