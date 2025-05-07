@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import TrustedProducts from './pages/TrustedProducts';
 import CounsellingProgram from './pages/CounsellingProgram';
+import Ebooks from './pages/Ebooks';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -33,6 +34,7 @@ function App() {
                     <Route path="/" element={<Index />} />
                     <Route path="/trusted-products" element={<TrustedProducts />} />
                     <Route path="/counselling-program" element={<CounsellingProgram />} />
+                    <Route path="/ebooks" element={<Ebooks />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </div>
