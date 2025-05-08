@@ -100,7 +100,7 @@ const VersesDisplay: React.FC<VersesDisplayProps> = ({ verses }) => {
         <h2 className="font-playfair text-2xl md:text-3xl text-white">{t.yourVerses}</h2>
         <Button 
           variant="outline" 
-          className="border-black text-black hover:bg-black/10 shadow-sm transition-all duration-300" 
+          className="border-black text-black hover:bg-gray-200 shadow-sm transition-all duration-300" 
           onClick={exportPdf}
         >
           <Download className="mr-2 h-4 w-4" />
