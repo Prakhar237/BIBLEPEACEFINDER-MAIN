@@ -17,21 +17,21 @@ const Navigation = () => {
       home: 'Home',
       workOfFaith: 'Works of Faith',
       trustedProducts: 'Trusted Products',
-      counsellingProgram: 'Counselling Programs',
+      counsellingProgram: 'Trusted Programs',
       ebooks: 'E-books'
     },
     es: {
       home: 'Inicio',
       workOfFaith: 'Obras de Fe',
       trustedProducts: 'Productos Confiables',
-      counsellingProgram: 'Programas de Consejería',
+      counsellingProgram: 'Programas de Confianza',
       ebooks: 'E-libros'
     },
     fr: {
       home: 'Accueil',
       workOfFaith: 'Œuvres de Foi',
       trustedProducts: 'Produits de Confiance',
-      counsellingProgram: 'Programmes de Conseil',
+      counsellingProgram: 'Programmes de Confiance',
       ebooks: 'E-livres'
     }
   };
