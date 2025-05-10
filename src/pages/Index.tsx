@@ -12,6 +12,7 @@ import { AlertCircle } from 'lucide-react';
 import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import StruggleSelector from '@/components/StruggleSelector';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const translations = {
   en: {
@@ -37,6 +38,7 @@ const IndexContent = () => {
   const [taglineIndex, setTaglineIndex] = useState(0);
   const { toast } = useToast();
   const { language, setLanguage } = useLanguage();
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     setTaglineIndex(0);
@@ -108,62 +110,64 @@ const IndexContent = () => {
         
         <div className="mt-16 md:mt-24">
           <div className="flex flex-col items-center gap-4 -mt-20">
-            <AnimatePresence mode="wait">
-              {taglineIndex === 0 && (
-                <motion.div
-                  key="tagline"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="flex flex-wrap justify-center gap-2"
-                >
-                  {t.tagline.split(' ').map((word, index) => (
-                    <motion.span
-                      key={index}
-                      initial={{ opacity: 0, y: 20, scale: 0.5 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{
-                        duration: 0.5,
-                        delay: index * 0.1,
-                        type: "spring",
-                        stiffness: 100
-                      }}
-                      className="text-lg md:text-xl text-white/90 inline-block"
-                    >
-                      {word}
-                    </motion.span>
-                  ))}
-                </motion.div>
-              )}
-              {taglineIndex === 1 && (
-                <motion.div
-                  key="altTagline"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="flex flex-wrap justify-center gap-2"
-                >
-                  {t.altTagline.split(' ').map((word, index) => (
-                    <motion.span
-                      key={index}
-                      initial={{ opacity: 0, y: 20, scale: 0.5 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{
-                        duration: 0.5,
-                        delay: index * 0.1,
-                        type: "spring",
-                        stiffness: 100
-                      }}
-                      className="text-lg md:text-xl text-white/90 inline-block"
-                    >
-                      {word}
-                    </motion.span>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {!isMobile && (
+              <AnimatePresence mode="wait">
+                {taglineIndex === 0 && (
+                  <motion.div
+                    key="tagline"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="flex flex-wrap justify-center gap-2"
+                  >
+                    {t.tagline.split(' ').map((word, index) => (
+                      <motion.span
+                        key={index}
+                        initial={{ opacity: 0, y: 20, scale: 0.5 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{
+                          duration: 0.5,
+                          delay: index * 0.1,
+                          type: "spring",
+                          stiffness: 100
+                        }}
+                        className="text-lg md:text-xl text-white/90 inline-block"
+                      >
+                        {word}
+                      </motion.span>
+                    ))}
+                  </motion.div>
+                )}
+                {taglineIndex === 1 && (
+                  <motion.div
+                    key="altTagline"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="flex flex-wrap justify-center gap-2"
+                  >
+                    {t.altTagline.split(' ').map((word, index) => (
+                      <motion.span
+                        key={index}
+                        initial={{ opacity: 0, y: 20, scale: 0.5 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{
+                          duration: 0.5,
+                          delay: index * 0.1,
+                          type: "spring",
+                          stiffness: 100
+                        }}
+                        className="text-lg md:text-xl text-white/90 inline-block"
+                      >
+                        {word}
+                      </motion.span>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            )}
           </div>
 
           <div className="mt-10">
