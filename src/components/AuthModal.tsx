@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthModalProps {
   onClose: () => void;
@@ -9,32 +10,64 @@ interface AuthModalProps {
 
 const AuthModal = ({ onClose, position }: AuthModalProps) => {
   const [tab, setTab] = useState<'signup' | 'signin'>('signup');
-  const [signupData, setSignupData] = useState({ username: '', password: '', confirmPassword: '' });
+  const [signupData, setSignupData] = useState({ email: '', password: '', confirmPassword: '' });
   const [signinData, setSigninData] = useState({ email: '', password: '' });
-  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn, signUp } = useAuth();
+  const { toast } = useToast();
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage('Account created successfully!');
-    signIn();
-    setTimeout(() => {
-      setMessage('');
+    if (signupData.password !== signupData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await signUp(signupData.email, signupData.password);
+      toast({
+        title: "Success",
+        description: "Account created successfully!"
+      });
       onClose();
       navigate('/');
-    }, 1200);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create account",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSignin = (e: React.FormEvent) => {
+  const handleSignin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage('Signed in successfully!');
-    signIn();
-    setTimeout(() => {
-      setMessage('');
+    setLoading(true);
+    try {
+      await signIn(signinData.email, signinData.password);
+      toast({
+        title: "Success",
+        description: "Signed in successfully!"
+      });
       onClose();
       navigate('/');
-    }, 1200);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to sign in",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const modalStyle = position
@@ -76,11 +109,11 @@ const AuthModal = ({ onClose, position }: AuthModalProps) => {
         {tab === 'signup' ? (
           <form onSubmit={handleSignup} className="space-y-4">
             <input
-              type="text"
-              placeholder="Username"
+              type="email"
+              placeholder="Email"
               className="w-full border rounded px-3 py-2"
-              value={signupData.username}
-              onChange={e => setSignupData({ ...signupData, username: e.target.value })}
+              value={signupData.email}
+              onChange={e => setSignupData({ ...signupData, email: e.target.value })}
               required
             />
             <input
@@ -101,9 +134,10 @@ const AuthModal = ({ onClose, position }: AuthModalProps) => {
             />
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+              disabled={loading}
+              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
             >
-              Create Account
+              {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
         ) : (
@@ -126,16 +160,16 @@ const AuthModal = ({ onClose, position }: AuthModalProps) => {
             />
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+              disabled={loading}
+              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
             >
-              Sign In
+              {loading ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
         )}
-        {message && <div className="mt-4 text-green-600 text-center font-medium">{message}</div>}
       </div>
     </div>
   );
 };
 
-export default AuthModal; 
+export default AuthModal;
