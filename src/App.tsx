@@ -11,6 +11,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import NotFound from "./pages/NotFound";
 import { LanguageProvider } from './contexts/LanguageContext';
 import { AuthProvider } from './contexts/AuthContext';
+import ScrollToTop from './components/ScrollToTop';
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ function App() {
                     <Route path="/ebooks" element={<Ebooks />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
+                  <ScrollToTop />
                 </div>
               </div>
             </Router>
